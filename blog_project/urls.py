@@ -18,17 +18,18 @@ from django.urls import path , include
 from rest_framework.routers import DefaultRouter
 
 from blog_app.views import(
-    UserModelViewSet,
+    # UserModelViewSet,
     PostModelViewSet,
-    CustomAPIView
+    UserCreationAPIView,
+    PaginatedPostModelViewSet
 )
 router = DefaultRouter()
-router.register('users',UserModelViewSet,basename='users')
-router.register('posts',PostModelViewSet,basename='posts')
+# router.register('users',UserModelViewSet,basename='users')
+router.register('all',PostModelViewSet,basename='posts')
+router.register('paginated',PaginatedPostModelViewSet,basename='paginated')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include(router.urls)),
-    path('user/',CustomAPIView.as_view()),
-
+    path('user/',UserCreationAPIView.as_view()),
 ]

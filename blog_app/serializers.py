@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id','user','title','content']
+        # fields = ['id','user','title','content']
+        fields = ['id','title','content']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

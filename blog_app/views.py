@@ -1,4 +1,3 @@
-from multiprocessing.sharedctypes import Value
 from django.shortcuts import render
 from rest_framework import viewsets
 # Create your views here.
@@ -13,17 +12,59 @@ from .serializers import (
     )
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .cutom_pagination import CustomLimitOffsetPagination
+from rest_framework.authentication import(
+    BasicAuthentication,
+
+)
+from rest_framework.permissions import(
+    IsAuthenticated
+)
+
+'''
+Removed because we are using api view so we don't need it 
+'''
+# class UserModelViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
-class UserModelViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+'''
+Return api response with pagination
+'''
+class PaginatedPostModelViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    pagination_class= CustomLimitOffsetPagination
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
+'''
+Return api response without pagination
+'''
 class PostModelViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer   
+    serializer_class = PostSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def create(self, request, *args, **kwargs):
+        try:
+            user_object = request.user
+            # no validation on title is given
+            title= request.data.get('title')
+            content= request.data.get('content')
+            Post.objects.create(user=user_object,title=title,content=content )
+            success = {'success' :'sucessfully created post in database'}
+            return Response(success)
+        except Exception as e:
+            error = {'error' :str(e)}
+            return Response(error)
+    
 
-class CustomAPIView(APIView):
+'''
+API for creating user using username and password with unique uername
+'''
+class UserCreationAPIView(APIView):
     def post(self, request , format=None,**kwargs):
         return self.valid_user(request)
 
@@ -33,15 +74,12 @@ class CustomAPIView(APIView):
     def valid_user(self,request):
         username = request.data.get('username')
         password = request.data.get('password')
-        print(password)
-        print(request.data)
         try :
             User.objects.create(username=username,password=password)
             success = {'success' :'Inserted Successfully '}
             return Response(success)    
         except Exception as e:
-            print(e)
-            error = {'error' :'Please Enter Valid user'}
+            error = {'error' :str(e)}
             return Response(error)            
         
 '''
