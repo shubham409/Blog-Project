@@ -11,7 +11,7 @@ from .serializers import (
     UserSerializer,
     PostSerializer
     )
-from rest_framework.views import APIView
+from rest_framework.views import APIView 
 from rest_framework.response import Response
 from .cutom_pagination import CustomLimitOffsetPagination
 from rest_framework.authentication import(
@@ -21,7 +21,8 @@ from rest_framework.authentication import(
 from rest_framework.permissions import(
     IsAuthenticated
 )
-
+from .serializers import PostListAllSerializer
+from .custom_paginator import CustomPagination
 '''
 Removed because we are using api view so we don't need it 
 '''
@@ -43,19 +44,44 @@ class PaginatedPostModelViewSet(viewsets.ModelViewSet):
 '''
 Return api response without pagination
 '''
-class PostModelViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+# class PostModelViewSet(viewsets.ModelViewSet):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+#     authentication_classes = [BasicAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     @staticmethod
+#     def validate_text(text):
+#         if(len(text)<=4):
+#             return False
+#         return True
+#     def create(self, request, *args, **kwargs):
+#         try:
+#             user_object = request.user
+#             title= request.data.get('title')
+#             title_validation_result = self.validate_text(title)
+#             content= request.data.get('content')
+#             content_validation_result = self.validate_text(content)
+#             if title_validation_result and content_validation_result:
+#                 Post.objects.create(user=user_object,title=title,content=content )
+#                 success = {'success' :'sucessfully created post in database'}
+#                 return Response(success)
+#             else:
+#                 error = {'error' :'Please Enter Title and Content with size greater than 4'}
+#                 return Response(error)                
+#         except Exception as e:
+#             error = {'error' :str(e)}
+#             return Response(error)
+
+
+class CreatePost(APIView):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
-
     @staticmethod
     def validate_text(text):
         if(len(text)<=4):
             return False
         return True
-
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             user_object = request.user
             title= request.data.get('title')
@@ -73,8 +99,85 @@ class PostModelViewSet(viewsets.ModelViewSet):
             error = {'error' :str(e)}
             return Response(error)
 
+    def get(self, request, *args, **kwargs):
+            error = {'error' :'Get method is not supported for creating use post method'}
+            return Response(error)
 
 
+
+class ListPost(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        query=None
+        authorid = kwargs.get('pk')
+        if(authorid!=None):
+            try:
+                # get user having id = authorid
+                user= User.objects.get(id=authorid)
+                # we get user now get all the post having user = user
+                query = Post.objects.filter(user=user)
+                serialized_response = PostListAllSerializer(query, many=True)
+                return Response(serialized_response.data)
+            except Exception as e:
+                error = {'error' :str(e)}
+                return Response(error)                
+        query = Post.objects.all()
+        try:
+            
+            serialized_response = PostListAllSerializer(query, many=True)
+            return Response(serialized_response.data)
+                           
+        except Exception as e:
+            error = {'error' :str(e)}
+            return Response(error)
+    def post(self, request, *args, **kwargs):
+            error = {'error' :'Post method is not supported for getting all use get method instead'}
+            return Response(error)        
+
+
+
+class PaginatedPosts(APIView ):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @staticmethod
+    def validate_text(text):
+        if(len(text)<=4):
+            return False
+        return True
+
+    def get(self, request, *args, **kwargs):
+        query=None
+        authorid = kwargs.get('pk')
+        if(authorid!=None):
+            try:
+                # get user having id = authorid
+                user= User.objects.get(id=authorid)
+                # we get user now get all the post having user = user
+                query = Post.objects.filter(user=user)
+                serialized_response = PostListAllSerializer(query, many=True)
+                return Response(serialized_response.data)
+            except Exception as e:
+                error = {'error' :str(e)}
+                return Response(error)                
+        query = Post.objects.all()
+        try:
+            
+            serialized_response = PostListAllSerializer(query, many=True)
+            return Response(serialized_response.data)
+                           
+        except Exception as e:
+            error = {'error' :str(e)}
+            return Response(error)
+    def post(self, request, *args, **kwargs):
+            error = {'error' :'Post method is not supported for getting all use get method instead'}
+            return Response(error)        
+
+    
+    
+    
     
 
 '''

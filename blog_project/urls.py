@@ -19,17 +19,29 @@ from rest_framework.routers import DefaultRouter
 
 from blog_app.views import(
     # UserModelViewSet,
-    PostModelViewSet,
+    # PostModelViewSet,
     UserCreationAPIView,
-    PaginatedPostModelViewSet
+    PaginatedPostModelViewSet,
+    ListPost,
+    CreatePost,
+    PaginatedPosts,
+
 )
 router = DefaultRouter()
 # router.register('users',UserModelViewSet,basename='users')
-router.register('all',PostModelViewSet,basename='posts')
-router.register('paginated',PaginatedPostModelViewSet,basename='paginated')
+# router.register('all',PostModelViewSet,basename='posts')
+# router.register('paginated',PaginatedPostModelViewSet,basename='paginated')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include(router.urls)),
-    path('user/',UserCreationAPIView.as_view()),
+    # path('user/',UserCreationAPIView.as_view()),
+    path('create/',CreatePost.as_view()),
+    path('listall/',ListPost.as_view()),
+    path('list/<int:pk>',ListPost.as_view()),
+
+    # ------------------------------------------------
+    path('paginatedposts/',PaginatedPosts.as_view()),
+    path('paginatedposts/<int:pk>',PaginatedPosts.as_view()),
+
 ]
