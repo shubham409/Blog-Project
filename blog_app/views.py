@@ -1,3 +1,4 @@
+from wsgiref import validate
 from django.shortcuts import render
 from rest_framework import viewsets
 # Create your views here.
@@ -47,18 +48,33 @@ class PostModelViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def validate_text(text):
+        if(len(text)<=4):
+            return False
+        return True
+
     def create(self, request, *args, **kwargs):
         try:
             user_object = request.user
-            # no validation on title is given
             title= request.data.get('title')
+            title_validation_result = self.validate_text(title)
             content= request.data.get('content')
-            Post.objects.create(user=user_object,title=title,content=content )
-            success = {'success' :'sucessfully created post in database'}
-            return Response(success)
+            content_validation_result = self.validate_text(content)
+            if title_validation_result and content_validation_result:
+                Post.objects.create(user=user_object,title=title,content=content )
+                success = {'success' :'sucessfully created post in database'}
+                return Response(success)
+            else:
+                error = {'error' :'Please Enter Title and Content with size greater than 4'}
+                return Response(error)                
         except Exception as e:
             error = {'error' :str(e)}
             return Response(error)
+
+
+
     
 
 '''
