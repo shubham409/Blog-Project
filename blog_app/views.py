@@ -13,7 +13,7 @@ from .serializers import (
     )
 from rest_framework.views import APIView 
 from rest_framework.response import Response
-from .
+from .custom_pagination import CustomPagination
 from rest_framework.authentication import(
     BasicAuthentication,
 
@@ -37,7 +37,7 @@ Return api response with pagination
 class PaginatedPostModelViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    pagination_class= CustomLimitOffsetPagination
+    pagination_class= CustomPagination
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -143,10 +143,12 @@ class ListPost(APIView):
 
 
 
-class PaginatedPosts(APIView ):
+class PaginatedPosts(APIView , CustomPagination):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
+
+    # This method or pagination not work in apiview
+    # pagination_class = CustomPagination
     @staticmethod
     def validate_text(text):
         if(len(text)<=4):
@@ -162,28 +164,27 @@ class PaginatedPosts(APIView ):
                 user= User.objects.get(id=authorid)
                 # we get user now get all the post having user = user
                 query = Post.objects.filter(user=user)
-                serialized_response = PostListAllSerializer(query, many=True)
-                return Response(serialized_response.data)
+
+                # for making query paginated 
+                paginated_query = self.paginate_queryset(query,request,view=self)
+                serialized_response = PostListAllSerializer(paginated_query, many=True)
+                return self.get_paginated_response(serialized_response.data)
             except Exception as e:
                 error = {'error' :str(e)}
                 return Response(error)                
-        query = Post.objects.all()
         try:
-            
-            serialized_response = PostListAllSerializer(query, many=True)
-            return Response(serialized_response.data)
-                           
+            query = Post.objects.all()
+            # for making query paginated 
+            paginated_query = self.paginate_queryset(query,request,view=self)            
+            serialized_response = PostListAllSerializer(paginated_query, many=True)
+            return self.get_paginated_response(serialized_response.data)               
         except Exception as e:
             error = {'error' :str(e)}
             return Response(error)
     def post(self, request, *args, **kwargs):
             error = {'error' :'Post method is not supported for getting all use get method instead'}
             return Response(error)        
-
-    
-    
-    
-    
+ 
 
 '''
 API for creating user using username and password with unique uername
@@ -205,7 +206,9 @@ class UserCreationAPIView(APIView):
         except Exception as e:
             error = {'error' :str(e)}
             return Response(error)            
-        
+
+
+
 '''
 
 may override these methods to make reqeusts 
