@@ -1,4 +1,3 @@
-from email.policy import default
 from rest_framework.pagination import LimitOffsetPagination
 class CustomPagination(LimitOffsetPagination):
     # when limit is not specifiec by client , client just provide offset

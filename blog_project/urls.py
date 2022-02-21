@@ -38,7 +38,7 @@ urlpatterns = [
     # path('user/',UserCreationAPIView.as_view()),
     path('create/',CreatePost.as_view()),
     path('listall/',ListPost.as_view()),
-    path('list/<int:pk>',ListPost.as_view()),
+    path('list/<str:username>',ListPost.as_view()),
 
     # ------------------------------------------------
     path('paginatedposts/',PaginatedPosts.as_view()),

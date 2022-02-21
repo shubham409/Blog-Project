@@ -13,7 +13,7 @@ from .serializers import (
     )
 from rest_framework.views import APIView 
 from rest_framework.response import Response
-from .cutom_pagination import CustomLimitOffsetPagination
+
 from rest_framework.authentication import(
     BasicAuthentication,
 
@@ -22,7 +22,7 @@ from rest_framework.permissions import(
     IsAuthenticated
 )
 from .serializers import PostListAllSerializer
-from .custom_paginator import CustomPagination
+from .custom_pagination import CustomPagination
 '''
 Removed because we are using api view so we don't need it 
 '''
@@ -111,11 +111,16 @@ class ListPost(APIView):
 
     def get(self, request, *args, **kwargs):
         query=None
-        authorid = kwargs.get('pk')
-        if(authorid!=None):
+        # difference between post and data
+        print(request.POST)
+        print(request.data)
+        username_from_get = kwargs.get('username')
+        username_from_header = request.data.get('username')
+        if(username_from_get!=None or username_from_header):
             try:
-                # get user having id = authorid
-                user= User.objects.get(id=authorid)
+                username = username_from_get if (username_from_get!=None) else username_from_header
+                # get user having username = username
+                user= User.objects.get(username=username)
                 # we get user now get all the post having user = user
                 query = Post.objects.filter(user=user)
                 serialized_response = PostListAllSerializer(query, many=True)
@@ -141,7 +146,7 @@ class ListPost(APIView):
 class PaginatedPosts(APIView ):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    
+    pagination_class = CustomPagination
     @staticmethod
     def validate_text(text):
         if(len(text)<=4):
