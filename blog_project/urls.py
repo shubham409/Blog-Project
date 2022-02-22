@@ -29,6 +29,8 @@ from blog_app.views import(
     UpdatePost,
 
 )
+from django.conf import settings
+from django.conf.urls.static import static
 router = DefaultRouter()
 # router.register('users',UserModelViewSet,basename='users')
 # router.register('all',PostModelViewSet,basename='posts')
@@ -52,4 +54,12 @@ urlpatterns = [
     # ---------------------------------------------------
     path('update/',UpdatePost.as_view()),
     path('update/<int:id>',UpdatePost.as_view()),    
-]
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+'''
++static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+usethis so that we can access url with the url pointing to mediaroot folder
+
+The MEDIA_ROOT is the path on the filesystem to the directory containing your static media.
+
+The MEDIA_URL is the URL that makes the static media accessible over HTTP.
+'''
