@@ -211,6 +211,43 @@ class DeletePost(APIView):
             error = {'error' :str(e)}
             return Response(error)   
 
+class UpdatePost(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            id_from_get = kwargs.get('id')
+            id_from_body = request.data.get('id')            
+            if id_from_body!=None or id_from_get!=None:
+                post_id = id_from_body if id_from_body!=None else id_from_get
+                
+                # we will only delete post if post belong to this user only else throw error post not exist
+                current_user_object = request.user
+
+                # fetching all the post made by this user only
+                post = Post.objects.filter(user = current_user_object).get(id = post_id)
+                
+                title = request.data.get('title')
+                if title != None:
+                    post.title = title
+                content = request.data.get('content')
+                if content != None :
+                    post.content = content
+                
+                # so that save method is called only when needed
+                if title is not None or content is not None:
+                    post.save()
+
+                success = {'success' :'sucessfully updated post in the database'}
+                return Response(success)
+            else:
+                error= {'error': 'Please Provide id of your post which you want to update. '}
+                return Response(error)
+        except Exception as e:
+            error = {'error' :str(e)}
+            return Response(error)  
+
 '''
 API for creating user using username and password with unique uername
 '''

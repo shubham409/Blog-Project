@@ -26,6 +26,7 @@ from blog_app.views import(
     CreatePost,
     PaginatedPosts,
     DeletePost,
+    UpdatePost,
 
 )
 router = DefaultRouter()
@@ -46,5 +47,9 @@ urlpatterns = [
     path('paginatedposts/<int:pk>',PaginatedPosts.as_view()),
     # -------------------------------------------------------
     path('delete/',DeletePost.as_view()),
-    path('delete/<int:id>',DeletePost.as_view()),    
+    path('delete/<int:id>',DeletePost.as_view()), 
+
+    # ---------------------------------------------------
+    path('update/',UpdatePost.as_view()),
+    path('update/<int:id>',UpdatePost.as_view()),    
 ]
