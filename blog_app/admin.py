@@ -4,12 +4,58 @@ from numpy import imag
 from .models import Post
 # Register your models here.    
 from django.utils.html import format_html
+from django.contrib.auth.models import User
+
+
+
+class DateFilter(admin.SimpleListFilter):
+    # title for the name of the filter to display on the screen
+    title = "Date Wise Filter"  
+    
+    # we can put anything here
+    parameter_name = "anything"  
+
+    def lookups(self, request, model_admin):
+        return [
+            # ('value_to_match','value to display on screen')
+            ("older_on_top", "Older post on top"),
+            ("recent_on_top", "Recent post on top"),
+        ]
+
+    def queryset(self, request, queryset):
+        # return respose on the basis of what is pressed
+        if self.value() == "older_on_top":
+            return queryset.order_by('creation_date_time')
+        if self.value() == "recent_on_top":
+            return queryset.order_by('-creation_date_time')
+
+class PublishFilter(admin.SimpleListFilter):
+    # title for the name of the filter to display on the screen
+    title = "Filter Published Or Not"  
+    
+    # we can put anything here
+    parameter_name = "anything"  
+
+    def lookups(self, request, model_admin):
+        return [
+            # ('value_to_match','value to display on screen')
+            ("published", "Published"),
+            ("non_published", "Non published"),
+        ]
+
+    def queryset(self, request, queryset):
+        # return respose on the basis of what is pressed
+        if self.value() == "published":
+            return queryset.filter(published=True)
+        if self.value() == "non_published":
+            return queryset.filter(published=False)
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     # fields = ['user','title','content','creation_date_time','image','published']
     readonly_fields = ('creation_date_time','id',)
     list_display= ['user','title','content','creation_date_time','image_function','published']
-
     def image_function(self,obj):
         width =200
         height =200
@@ -34,4 +80,19 @@ class PostAdmin(admin.ModelAdmin):
     def make_unpblished(self, request, queryset):
         queryset.update(published=False)
 
-       
+    list_filter = (DateFilter,PublishFilter,)
+
+
+    # to show search field the admin page
+    search_fields = ('user',)
+    # it gives query set and a boolean whether it contains duplicated or not
+    def get_search_results(self, request, queryset, search_term):
+        try:
+            user=User.objects.get(username=search_term)
+            queryset.filter(user=user)
+        except:
+
+            return queryset.none(), False
+        return queryset.filter(user=user),True
+
+
