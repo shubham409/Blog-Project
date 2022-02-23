@@ -58,3 +58,6 @@ class AbstractChild(AbstractParent):
 
 
 
+class ProxyPost(Post):
+    class Meta:
+        proxy=True

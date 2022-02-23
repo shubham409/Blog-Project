@@ -12,6 +12,7 @@ from .models import (
 
     AbstractParent,
     AbstractChild,
+    ProxyPost,
     )
 # Register your models here.    
 from django.utils.html import format_html
@@ -135,3 +136,7 @@ class AbstractParent(admin.ModelAdmin):
 class AbstractChild(admin.ModelAdmin):
     list_display= ['name','roll']
 
+@admin.register(ProxyPost)
+class ProxyPostAdmin(admin.ModelAdmin ):
+    list_display= ['name','roll']
+    change_list_template=''
