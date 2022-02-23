@@ -18,12 +18,43 @@ class Post(models.Model):
     def __str__(self) -> str:
         return self.title +" posted by "+self.user.username
 
+# ----------------------------------------------------------------------
+#  types of inheritace in django
+
+# proxy
+class ProxyParent(models.Model):
+    name = models.CharField(max_length=50)
+    roll = models.CharField(max_length=10)
+
+
+class ProxyChild(ProxyParent):
+    class Meta:
+        proxy=True
+        ordering=['-name']
+
+
+# multi table 
+
+class MultiTableParent(models.Model):
+    colg = models.CharField(max_length=50)
+    location = models.CharField(max_length=10)
+
+class MultiTableChild(MultiTableParent):
+    name = models.CharField(max_length=50)
+    roll = models.CharField(max_length=10)
 
 
 
+# abstract
 
+class AbstractParent(models.Model):
+    name = models.CharField(max_length=50)
+    roll = models.CharField(max_length=10)    
+    class Meta:
+        abstract=True
 
-
+class AbstractChild(AbstractParent):
+    branch = models.CharField(max_length=10)
 
 
 

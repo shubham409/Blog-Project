@@ -1,7 +1,18 @@
 from django.conf import settings
 from django.contrib import admin
 from numpy import imag
-from .models import Post
+from .models import (
+    Post,
+
+    ProxyParent,
+    ProxyChild,
+
+    MultiTableParent,
+    MultiTableChild,
+
+    AbstractParent,
+    AbstractChild,
+    )
 # Register your models here.    
 from django.utils.html import format_html
 from django.contrib.auth.models import User
@@ -95,4 +106,32 @@ class PostAdmin(admin.ModelAdmin):
             return queryset.none(), False
         return queryset.filter(user=user),True
 
+
+# abstract
+# Error cant be registered 
+# @admin.register(AbstractParent)
+# class AbstractParent(admin.ModelAdmin):
+#     list_display= ['name','roll']
+
+@admin.register(AbstractChild)
+class AbstractChild(admin.ModelAdmin):
+    list_display= ['branch']
+
+# MultiTable
+@admin.register(MultiTableParent)
+class AbstractParent(admin.ModelAdmin):
+    list_display= ['colg','location']
+
+@admin.register(MultiTableChild)
+class AbstractChild(admin.ModelAdmin):
+    list_display= ['name','roll']
+
+# Proxy
+@admin.register(ProxyParent)
+class AbstractParent(admin.ModelAdmin):
+    list_display= ['name','roll']
+
+@admin.register(ProxyChild)
+class AbstractChild(admin.ModelAdmin):
+    list_display= ['name','roll']
 
