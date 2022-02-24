@@ -109,6 +109,7 @@ class PostAdmin(admin.ModelAdmin):
         return queryset.filter(user=user),True
 
 
+
 # abstract
 # Error cant be registered 
 # @admin.register(AbstractParent)
@@ -142,7 +143,7 @@ class AbstractChild(admin.ModelAdmin):
 
 @admin.register(ProxyPost)
 class ProxyPostAdmin(admin.ModelAdmin ):
-    # list_display= ['name','roll']
+    list_display= ['title','content']
     change_list_template='customlist.html'
     
     def changelist_view(self, request: HttpRequest, extra_context =None):
@@ -190,3 +191,5 @@ class ProxyPostAdmin(admin.ModelAdmin ):
         }
         return super().changelist_view(request, extra)
     list_filter = (DateFilter,PublishFilter,)
+
+

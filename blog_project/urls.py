@@ -27,6 +27,7 @@ from blog_app.views import(
     PaginatedPosts,
     DeletePost,
     UpdatePost,
+    CountPublishedAndNot,
 
 )
 from django.conf import settings
@@ -54,6 +55,7 @@ urlpatterns = [
     # ---------------------------------------------------
     path('update/',UpdatePost.as_view()),
     path('update/<int:id>',UpdatePost.as_view()),    
+    path('countpublished/',CountPublishedAndNot.as_view()),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 '''
 +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -269,7 +269,15 @@ class UserCreationAPIView(APIView):
             error = {'error' :str(e)}
             return Response(error)            
 
-
+class CountPublishedAndNot(APIView):
+    def get(self,request,format=None,*args, **kwargs):
+        published= Post.objects.filter(published=True).count()
+        non_published= Post.objects.filter(published=False).count()
+        dct ={
+            "published":published,
+            "non published":non_published
+        }
+        return Response(dct)
 
 '''
 
