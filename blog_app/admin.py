@@ -27,7 +27,7 @@ class DateFilter(admin.SimpleListFilter):
     title = "Date Wise Filter"  
     
     # we can put anything here
-    parameter_name = "anything"  
+    parameter_name = "another"  
 
     def lookups(self, request, model_admin):
         return [
@@ -65,10 +65,11 @@ class PublishFilter(admin.SimpleListFilter):
             return queryset.filter(published=False)
 
 
-@admin.register(Post)
+# @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     # fields = ['user','title','content','creation_date_time','image','published']
     readonly_fields = ('creation_date_time','id',)
+    # list_display= ['user','title','content','creation_date_time','published']
     list_display= ['user','title','content','creation_date_time','image_function','published']
     def image_function(self,obj):
         width =200
@@ -101,14 +102,17 @@ class PostAdmin(admin.ModelAdmin):
     # it gives query set and a boolean whether it contains duplicated or not
     def get_search_results(self, request, queryset, search_term):
         try:
-            user=User.objects.get(username=search_term)
-            queryset.filter(user=user)
+            if(search_term!=''):
+                user=User.objects.get(username=search_term)
+                return queryset.filter(user=user),True
+            else:
+                return queryset,True
         except:
+            print('Except')
+            return queryset.none(), True
+        
 
-            return queryset.none(), False
-        return queryset.filter(user=user),True
-
-
+admin.site.register(Post,PostAdmin)
 
 # abstract
 # Error cant be registered 
@@ -144,11 +148,16 @@ class AbstractChild(admin.ModelAdmin):
 @admin.register(ProxyPost)
 class ProxyPostAdmin(admin.ModelAdmin ):
     list_display= ['title','content']
-    change_list_template='customlist.html'
+    change_list_template='proxypost/customlist.html'
     
     def changelist_view(self, request: HttpRequest, extra_context =None):
         queryset= self.get_queryset(request)
-        queryset.filter()
+        ls=request.GET.get('anything')
+        if(ls=='published'):
+            queryset=queryset.filter(published=True)
+        elif ls=='non_published':
+            queryset=queryset.filter(published=False)
+
         today = datetime.now()
 
         week = timedelta(days=7)
