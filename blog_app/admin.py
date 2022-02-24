@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
+from django.http import HttpRequest
 from numpy import imag
 from .models import (
     Post,
@@ -18,6 +19,7 @@ from .models import (
 from django.utils.html import format_html
 from django.contrib.auth.models import User
 
+from datetime import datetime, timedelta
 
 
 class DateFilter(admin.SimpleListFilter):
@@ -71,7 +73,6 @@ class PostAdmin(admin.ModelAdmin):
     def image_function(self,obj):
         width =200
         height =200
-
         if(self.valid_or_not(obj)):
             return format_html('<img src="{}" alt="Not Provided" width="{}" height="{}">', obj.image.url,width,height)
         else:
@@ -136,7 +137,56 @@ class AbstractParent(admin.ModelAdmin):
 class AbstractChild(admin.ModelAdmin):
     list_display= ['name','roll']
 
+
+
+
 @admin.register(ProxyPost)
 class ProxyPostAdmin(admin.ModelAdmin ):
-    list_display= ['name','roll']
-    change_list_template=''
+    # list_display= ['name','roll']
+    change_list_template='customlist.html'
+    
+    def changelist_view(self, request: HttpRequest, extra_context =None):
+        queryset= self.get_queryset(request)
+        queryset.filter()
+        today = datetime.now()
+
+        week = timedelta(days=7)
+        month = timedelta(days= 30)
+        year = timedelta(days= 364)
+        current = datetime.now()
+        one_week_before = current-week
+        one_month_before = current-month
+        one_year_before = current-year
+
+        # in accurate week month or year
+
+        current_week= today.isocalendar().week
+        current_year = today.year
+        current_month= today.month
+
+
+
+        today= queryset.filter(creation_date_time__date=today.date()).count()
+        
+        week= queryset.filter(creation_date_time__gte=one_week_before).count()
+        month= queryset.filter(creation_date_time__gte=one_month_before).count()
+        year= queryset.filter(creation_date_time__gte=one_year_before).count()
+        
+        this_week= queryset.filter(creation_date_time__week=current_week).count()
+        this_month= queryset.filter(creation_date_time__month=current_month).count()
+        this_year= queryset.filter(creation_date_time__year=current_year).count()
+        
+        
+        extra = {
+            "posts_today":today,
+
+            "posts_in_one_week":week,
+            "posts_in_one_month":month,
+            "posts_in_one_year":year,
+
+            "posts_this_week":this_week,
+            "posts_this_month":this_month,
+            "posts_this_year":this_year,
+        }
+        return super().changelist_view(request, extra)
+    list_filter = (DateFilter,PublishFilter,)

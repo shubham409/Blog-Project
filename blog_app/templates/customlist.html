@@ -1,0 +1,39 @@
+{% extends "admin/change_list.html" %}
+{% block result_list %}
+<table>
+    <tr>
+      <th>Property</th>
+      <th>value</th>
+    </tr>
+    <tr>
+      <td>Posts Today</td>
+      <td>{{posts_today}}</td>
+    </tr>
+    <tr>
+      <td>Post In One week</td>
+      <td>{{posts_in_one_week}}</td>
+    </tr>
+    <tr>
+        <td>Post In One Month</td>
+        <td>{{posts_in_one_month}}</td>
+    </tr>
+    <tr>
+      <td>Post in one year</td>
+      <td>{{posts_in_one_year}}</td>
+    </tr> 
+    
+    <h1></h1>
+    <tr>
+      <td>Post In One week</td>
+      <td>{{posts_this_week}}</td>
+    </tr>
+    <tr>
+        <td>Post In One Month</td>
+        <td>{{posts_this_month}}</td>
+    </tr>
+    <tr>
+      <td>Post in one year</td>
+      <td>{{posts_this_year}}</td>
+    </tr>  
+  </table>
+{% endblock %}

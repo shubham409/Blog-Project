@@ -61,3 +61,4 @@ class AbstractChild(AbstractParent):
 class ProxyPost(Post):
     class Meta:
         proxy=True
+        verbose_name = "ProxyPost"
