@@ -98,19 +98,21 @@ class PostAdmin(admin.ModelAdmin):
 
 
     # to show search field the admin page
-    search_fields = ('user',)
-    # it gives query set and a boolean whether it contains duplicated or not
-    def get_search_results(self, request, queryset, search_term):
-        try:
-            if(search_term!=''):
-                user=User.objects.get(username=search_term)
-                return queryset.filter(user=user),True
-            else:
-                return queryset,True
-        except:
-            print('Except')
-            return queryset.none(), True
-        
+    # search_fields = ('user',)
+    # # it gives query set and a boolean whether it contains duplicated or not
+    # def get_search_results(self, request, queryset, search_term):
+    #     try:
+    #         if(search_term!=''):
+    #             user=User.objects.get(username=search_term)
+    #             return queryset.filter(user=user),True
+    #         else:
+    #             return queryset,True
+    #     except:
+    #         return queryset.none(), True
+
+
+    # Alternate way to search using username
+    search_fields= ('user__username',)
 
 admin.site.register(Post,PostAdmin)
 
