@@ -14,6 +14,8 @@ from .models import (
     AbstractParent,
     AbstractChild,
     ProxyPost,
+
+    Singleton,
     )
 # Register your models here.    
 from django.utils.html import format_html
@@ -67,10 +69,11 @@ class PublishFilter(admin.SimpleListFilter):
 
 # @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    # fields = ['user','title','content','creation_date_time','image','published']
+    fields = ['user','title','content','creation_date_time','image','published']
+    date_hierarchy = 'creation_date_time'
     readonly_fields = ('creation_date_time','id',)
     # list_display= ['user','title','content','creation_date_time','published']
-    list_display= ['user','title','content','creation_date_time','image_function','published']
+    list_display= ['user','username','title','content','creation_date_time','image_function','published']
     def image_function(self,obj):
         width =200
         height =200
@@ -78,6 +81,10 @@ class PostAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" alt="Not Provided" width="{}" height="{}">', obj.image.url,width,height)
         else:
             return format_html('<h1>No Image Provided</h1>')
+    def username(self,obj):
+        return format_html('{} {}',obj.user.username,obj.user.password)
+
+
 
     # if there will be url it would return True else retuen false
     def valid_or_not(self,obj):
@@ -94,7 +101,7 @@ class PostAdmin(admin.ModelAdmin):
     def make_unpblished(self, request, queryset):
         queryset.update(published=False)
 
-    list_filter = (DateFilter,PublishFilter,)
+    list_filter = (DateFilter,PublishFilter,'published')
 
 
     # to show search field the admin page
@@ -204,3 +211,4 @@ class ProxyPostAdmin(admin.ModelAdmin ):
     list_filter = (DateFilter,PublishFilter,)
 
 
+admin.site.register(Singleton)

@@ -1,3 +1,4 @@
+from asyncio import current_task
 from email.policy import default
 from pyexpat import model
 from django.db import models
@@ -62,3 +63,26 @@ class ProxyPost(Post):
     class Meta:
         proxy=True
         verbose_name = "ProxyPost"
+
+class Singleton(models.Model):
+    # key = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs) -> None:
+        count_objects= Singleton.objects.count()
+        # this will run when count_objects is non 0 and change the primary non unique which raise intrigrity error 
+        if count_objects:
+            current_key = Singleton.objects.first().pk
+            print(current_key)
+            self.pk= current_key
+        super().save(*args, **kwargs)
+    
+
+    class Meta:
+        verbose_name = "Singleton"
+        verbose_name_plural = "Singletons"
+
+    def __str__(self):
+        return self.name
+
+

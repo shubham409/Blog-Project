@@ -1,11 +1,13 @@
+from re import sub
 from wsgiref import validate
 from django.shortcuts import render
 from rest_framework import viewsets
 # Create your views here.
-
+from django.db.models import Subquery
 from django.contrib.auth.models import User
 from .models import (
     Post,
+    Singleton,
 )
 from .serializers import (
     UserSerializer,
@@ -299,4 +301,171 @@ may override these methods to make reqeusts
 
     def destroy(self, request, pk=None):
         pass
-'''    
+'''
+from django.db.models import F,Q, Count,Max
+class AllQuery(APIView):
+
+    def get(self,request,format=None,*args, **kwargs):
+        # 6  only and values
+        print(6)
+        query1=Post.objects.all().only('title')
+        print(query1)
+        println()
+        query1=Post.objects.all().values('title')
+        print(query1)
+        println()
+        query1=Post.objects.all().values('user__username')
+        print(query1)
+        println()
+
+        # 7 
+        print(7)
+        subquery =User.objects.all().values('username')
+        print(subquery)
+        println()
+
+        query2 = Post.objects.filter(user__username__in = Subquery(subquery))
+        print(query2)
+        println()
+
+        # 8 
+        print(8)
+        query3 =Post.objects.filter(title=F('content'))
+        print(query3)
+        println()
+
+
+        # 9 
+        print(9)
+        query4 = Post.objects.filter(Q(image='') | Q(image=None))
+        print(query4)
+        println()
+
+        # 10 Join
+        print(10)
+        query5 = Post.objects.filter(user__username='admin')
+        print(query5)
+        println()
+        
+        # 11 nth highest
+        # - decreasing order
+        # + increasing order
+        print(11)
+        query6= Post.objects.order_by('-id')
+        print(query6)
+        n=1
+        print(query6[n])
+        println()
+
+        # 12. Finding duplicates
+        print(12)
+        query7= Post.objects.values('title').annotate(count_title = Count('title')).filter(count_title__gt=1)
+        print(query7)
+        println()
+
+        # 13. Finding title that don't have any duplicate that is their count is only equal to 1
+        print(13)
+        query8 = Post.objects.values('title').annotate(count_title= Count('title')).filter(count_title=1)
+        print(query8)
+        # 13.1 for getting all the distict values of admin name use distict
+        
+        # it is not supported by database backened
+        # query9 = Post.objects.distinct('user__username').all()
+        # print(query9)
+        println()
+
+        # 14. and or and not in Q
+        # list post of which username either starts with a(admin) or end with e(simple)
+        print(14)        
+        query10 = Post.objects.filter(Q(user__username__startswith ='a') | Q(user__username__endswith ='e'))
+        print(query10)
+        # list post of which username starts with s(simple , staff) but doesn't end with f(simple)
+        query10 = Post.objects.filter(Q(user__username__startswith ='s') & ~Q(user__username__endswith ='f'))
+        print(query10)
+        println()
+
+        # 16 selecting a random Post object 
+        # 1st way is use order_by("?") it can be slow dont know why
+        
+        # when there are no deletions 
+        print(16)
+        query11= Post.objects.aggregate(max_count= Max('id'))['max_count']
+        print(query11)
+        from random import randint
+
+        try:
+            random_id= randint(1,query11)
+            query12 = Post.objects.get(id=random_id)
+            print(query12)
+        except Exception as e:
+            print(e)
+
+
+        # when there have been deletions 
+        query11= Post.objects.aggregate(max_count= Max('id'))['max_count']
+        print(query11)
+        from random import randint
+        while True:
+            try:
+                random_id= randint(1,query11)
+                query12 = Post.objects.get(id=random_id)
+                print(query12)
+                break
+            except Exception as e:
+                print(e)
+        println()
+
+        # Creating multiple objects from bulk data
+        print("query no = 1")
+        print('Count before insertion bulk data',Post.objects.count())
+        user=None
+        try:
+            user=User.objects.get(username="NewUser")
+        except:
+            user=User.objects.create(
+                username="NewUser",
+                is_active=True,
+            )
+            user.set_password('@password123')
+            user.save()
+        list_of_unsaved_objects = [Post(user=user,title=f'Bulkedit Title{i}',content=f'Bulkedit Content{i}') for i in range(1,3)]
+        Post.objects.bulk_create(
+            list_of_unsaved_objects
+        )
+        print('Count after insertion bulk data',Post.objects.count())
+        println()
+
+        # 3 Truncate
+        print('query no = 5')
+        print('Count before deletion' , Singleton.objects.count())
+        Singleton.objects.all().delete()
+        print('Count after deletion' , Singleton.objects.count())
+        println()
+
+        # 2 Order by using case insensitive titles 
+        from django.db.models.functions import Lower
+        # Flat = True to get in one list
+        print('query no. = 2')
+        ls= Post.objects.all().order_by(Lower('title')).values_list('title', flat=True)
+        print(ls)
+        println()
+
+
+
+
+
+
+
+
+
+
+
+
+    
+        
+
+        return Response()
+
+
+def println():
+    print('-'*100)
