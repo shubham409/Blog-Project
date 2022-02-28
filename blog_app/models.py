@@ -85,6 +85,8 @@ class Singleton(models.Model):
     def __str__(self):
         return self.name
 
+# ----------------------------------------------------------------------------
+
 
 # 10
 # query difference between null = true and blank = true
@@ -122,7 +124,7 @@ class TempUser(models.Model):
     class Meta:
         db_table = "temp_user"
 
-# stting column name 
+# sitting column name 
 class ColumnName(models.Model):
     a = models.CharField(max_length=40,db_column='column1')
     column2 = models.CharField(max_length=50)

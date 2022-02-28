@@ -18,6 +18,11 @@ from .models import (
     Singleton,
     NullTrueModel,
     BlankTrueModel,
+
+    TempUser,
+    ColumnName,
+    Article,
+    Event
     )
 # Register your models here.    
 from django.utils.html import format_html
@@ -216,3 +221,10 @@ class ProxyPostAdmin(admin.ModelAdmin ):
 admin.site.register(Singleton)
 admin.site.register(NullTrueModel)
 admin.site.register(BlankTrueModel)
+
+
+
+admin.site.register(TempUser)
+admin.site.register(ColumnName)
+admin.site.register(Article)
+admin.site.register(Event)
