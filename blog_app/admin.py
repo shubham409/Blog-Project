@@ -16,6 +16,8 @@ from .models import (
     ProxyPost,
 
     Singleton,
+    NullTrueModel,
+    BlankTrueModel,
     )
 # Register your models here.    
 from django.utils.html import format_html
@@ -212,3 +214,5 @@ class ProxyPostAdmin(admin.ModelAdmin ):
 
 
 admin.site.register(Singleton)
+admin.site.register(NullTrueModel)
+admin.site.register(BlankTrueModel)

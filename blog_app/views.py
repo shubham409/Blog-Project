@@ -449,21 +449,6 @@ class AllQuery(APIView):
         ls= Post.objects.all().order_by(Lower('title')).values_list('title', flat=True)
         print(ls)
         println()
-
-
-
-
-
-
-
-
-
-
-
-
-    
-        
-
         return Response()
 
 

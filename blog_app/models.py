@@ -86,3 +86,47 @@ class Singleton(models.Model):
         return self.name
 
 
+# 10
+# query difference between null = true and blank = true
+class NullTrueModel(models.Model):
+    title = models.CharField(max_length=40,null=True)
+
+# Blank true allow empty value in the attribute
+class BlankTrueModel(models.Model):
+    content = models.CharField(max_length=20,blank=True)
+
+
+from django.utils.text import slugify
+
+# slug field 
+class Article(models.Model):
+    headline = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.headline)
+        super(Article, self).save(*args, **kwargs)
+
+# uuid
+import uuid
+from django.db import models
+
+class Event(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    details = models.TextField()
+    years_ago = models.PositiveIntegerField()
+
+# settings table name
+class TempUser(models.Model):
+    first_name = models.CharField(max_length=100)
+    class Meta:
+        db_table = "temp_user"
+
+# stting column name 
+class ColumnName(models.Model):
+    a = models.CharField(max_length=40,db_column='column1')
+    column2 = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.a
+
